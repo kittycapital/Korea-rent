@@ -5,6 +5,7 @@
 <title>전국 구별 아파트 전월세 평당가 TOP 10</title>
 <meta property="og:title" content="전국 구별 아파트 전월세 평당가 TOP 10 | HerdVibe">
 <meta property="og:description" content="최근 6개월 실거래 기준 · 전용면적 59㎡ 이상 · 단지별 최고가">
+<meta property="og:url" content="https://herdvibe.com/99">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -197,7 +198,7 @@ table.main-table thead th:last-child{text-align:right}
 
 <script>
 /* ── 공유 ── */
-const SHARE_URL = 'https://herdvibe.com/rent';
+const SHARE_URL = 'https://herdvibe.com/99';
 const SHARE_TITLE = '전국 구별 아파트 전월세 평당가 TOP 10';
 const SHARE_DESC = '최근 6개월 실거래 기준 · 전용면적 59㎡ 이상';
 
@@ -595,6 +596,15 @@ async function init() {
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
+
+/* ── iframe 높이 자동 전달 ── */
+function sendHeight() {
+    const h = document.documentElement.scrollHeight;
+    window.parent.postMessage({ type: 'resize', height: h }, '*');
+}
+const ro = new ResizeObserver(sendHeight);
+ro.observe(document.body);
+window.addEventListener('load', sendHeight);
 </script>
 </body>
 </html>
