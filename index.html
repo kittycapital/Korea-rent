@@ -24,7 +24,7 @@
 }
 
 html,body{overflow-x:hidden}
-body{font-family:'Noto Sans KR',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;padding:40px 20px}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg-primary);color:var(--text-primary);padding:40px 20px}
 .container{max-width:1200px;margin:0 auto}
 
 /* Header */
@@ -415,13 +415,13 @@ function render() {
     currentSeries = d ? d.series : [];
     renderChart();
     renderTable(d);
+    sendHeight();
 }
 
 async function switchType(type) {
     currentType = type;
     const cfg = TYPE_CONFIG[type];
 
-    // 탭 UI
     document.querySelectorAll('.type-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.type-tab').forEach(t => {
         if ((type === 'jeonse' && t.textContent === '전세') ||
@@ -429,17 +429,14 @@ async function switchType(type) {
             t.classList.add('active');
     });
 
-    // 헤더
     document.getElementById('mainTitle').textContent = cfg.title;
     document.getElementById('mainSubtitle').textContent = cfg.subtitle;
     document.getElementById('priceHeader').textContent = cfg.priceLabel;
 
-    // 기간 초기화
     currentRange = 6;
     document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('btn-6m').classList.add('active');
 
-    // 데이터 로드
     activeIdx = -1;
     try {
         const resp = await fetch(cfg.json);
@@ -582,6 +579,7 @@ function handleRowClick(idx) {
     const arr = document.getElementById('arrow-'+idx);
     if (det) det.classList.toggle('show');
     if (arr) arr.classList.toggle('open');
+    sendHeight();
 }
 
 async function init() {
@@ -597,13 +595,26 @@ async function init() {
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
 
-/* ── iframe 높이 자동 전달 ── */
+/* ── iframe 높이 자동 전달 (무한 루프 방지) ── */
+var _lastSentHeight = 0;
+var _heightTimer = null;
+
 function sendHeight() {
-    const h = document.documentElement.scrollHeight;
-    window.parent.postMessage({ type: 'resize', height: h }, '*');
+    if (_heightTimer) return;
+    _heightTimer = setTimeout(function() {
+        _heightTimer = null;
+        var container = document.querySelector('.container');
+        var h = container ? container.offsetHeight + 80 : document.body.scrollHeight;
+        if (Math.abs(h - _lastSentHeight) > 2) {
+            _lastSentHeight = h;
+            window.parent.postMessage({ type: 'resize', height: h }, '*');
+        }
+    }, 150);
 }
-const ro = new ResizeObserver(sendHeight);
-ro.observe(document.body);
+
+/* ResizeObserver 대신 MutationObserver로 실제 DOM 변경만 감지 */
+var _mo = new MutationObserver(sendHeight);
+_mo.observe(document.getElementById('tableBody') || document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
 window.addEventListener('load', sendHeight);
 </script>
 </body>
