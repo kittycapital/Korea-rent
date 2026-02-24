@@ -1,0 +1,28 @@
+name: Update Apartment Dashboards
+
+on:
+  push:
+    paths:
+      - 'data/csv/**'          # 매매 CSV 추가/변경 시
+      - 'data/csv_jeonse/**'   # 전월세 CSV 추가/변경 시
+  workflow_dispatch:            # 수동 실행
+
+jobs:
+  update-all:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Generate dashboards from CSV
+        env:
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        run: python fetch_all.py
+      - name: Commit and push
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/ index.html seoul.html
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update dashboards $(date +'%Y-%m-%d')" && git push)
