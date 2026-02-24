@@ -2,10 +2,9 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>전국 구별 아파트 평당가 TOP 10</title>
-<meta property="og:title" content="전국 구별 아파트 평당가 TOP 10 | HerdVibe">
+<title>전국 구별 아파트 전월세 평당가 TOP 10</title>
+<meta property="og:title" content="전국 구별 아파트 전월세 평당가 TOP 10 | HerdVibe">
 <meta property="og:description" content="최근 6개월 실거래 기준 · 전용면적 59㎡ 이상 · 단지별 최고가">
-<meta property="og:url" content="https://herdvibe.com/37">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -27,7 +26,7 @@ html,body{overflow-x:hidden}
 body{font-family:'Noto Sans KR',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;padding:40px 20px}
 .container{max-width:1200px;margin:0 auto}
 
-/* Header - centered */
+/* Header */
 .header{text-align:center;padding:30px 0 20px;border-bottom:1px solid var(--border-color);margin-bottom:20px}
 .header h1{font-size:1.8rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px;background:linear-gradient(135deg,#fff 0%,#888 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .subtitle{color:var(--text-secondary);font-size:0.85rem}
@@ -50,7 +49,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg-primary);color:va
 .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:#222;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;opacity:0;transition:all 0.3s;z-index:9999;pointer-events:none;border:1px solid #333}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* Tabs - centered */
+/* Type tabs (전세/월세) */
+.type-tabs{display:flex;gap:4px;justify-content:center;margin-bottom:16px;background:var(--bg-tertiary);border-radius:12px;padding:6px;max-width:240px;margin-left:auto;margin-right:auto}
+.type-tab{flex:1;padding:10px 20px;border-radius:8px;font-size:0.9rem;font-weight:500;cursor:pointer;border:none;background:transparent;color:#888;transition:all 0.2s;font-family:inherit;text-align:center}
+.type-tab:hover{color:#ccc}
+.type-tab.active{background:#00d4aa;color:#000;font-weight:700}
+
+/* Region tabs */
 .tab-section{background:var(--bg-tertiary);border-radius:12px;padding:20px;margin-bottom:16px}
 .tab-group-label{font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;letter-spacing:1px;text-align:center}
 .tab-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;justify-content:center}
@@ -59,7 +64,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg-primary);color:va
 .tab:hover{background:#222;color:#ccc}
 .tab.active{background:#00d4aa;color:#000;font-weight:700;border-color:#00d4aa}
 
-/* Dropdown - centered */
+/* Dropdown */
 .dropdown-area{display:flex;align-items:center;gap:14px;margin-bottom:20px;justify-content:center}
 .dropdown-label{color:#888;font-size:0.85rem;white-space:nowrap}
 .dropdown-select{flex:0 1 280px;padding:10px 40px 10px 16px;border-radius:10px;background:var(--bg-tertiary);border:1px solid #333;color:#fff;font-size:0.9rem;font-family:inherit;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' fill='none' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;cursor:pointer}
@@ -113,12 +118,6 @@ table.main-table thead th:last-child{text-align:right}
 
 .footer{margin-top:40px;padding-top:20px;border-top:1px solid #222;color:var(--text-muted);font-size:0.8rem;text-align:center}
 
-/* Type tabs (매매/전세/월세) */
-.type-tabs{display:flex;gap:4px;justify-content:center;margin-bottom:16px;background:var(--bg-tertiary);border-radius:12px;padding:6px;max-width:320px;margin-left:auto;margin-right:auto}
-.type-tab{flex:1;padding:10px 16px;border-radius:8px;font-size:0.9rem;font-weight:500;cursor:pointer;border:none;background:transparent;color:#888;transition:all 0.2s;font-family:inherit;text-align:center}
-.type-tab:hover{color:#ccc}
-.type-tab.active{background:#00d4aa;color:#000;font-weight:700}
-
 @media(max-width:768px){.insight-cards{grid-template-columns:1fr 1fr 1fr}.tab{padding:6px 10px;font-size:0.75rem}.share-btn-s{padding:5px 8px;font-size:10px}.share-btn-s .label-text{display:none}}
 @media(max-width:600px){body{padding:20px 12px}.header h1{font-size:1.4rem}.insight-cards{grid-template-columns:1fr}.chart-canvas-wrap{height:180px}.detail-content{flex-direction:column;padding:12px 8px 12px 16px;gap:12px}.detail-map iframe{width:100%;max-width:300px}.main-row td{padding:10px 6px;font-size:0.85rem}}
 </style>
@@ -128,16 +127,9 @@ table.main-table thead th:last-child{text-align:right}
 
 <!-- Header -->
 <header class="header">
-<h1 id="mainTitle">전국 구별 아파트 평당가 TOP 10</h1>
+<h1 id="mainTitle">전국 구별 아파트 전세 평당가 TOP 10</h1>
 <p class="subtitle" id="mainSubtitle">최근 6개월 실거래 기준 · 전용면적 59㎡ 이상 · 단지별 최고가</p>
 </header>
-
-<!-- Type Tabs (매매/전세/월세) -->
-<div class="type-tabs" id="typeTabs">
-<button class="type-tab active" onclick="switchType('sale')">매매</button>
-<button class="type-tab" onclick="switchType('jeonse')">전세</button>
-<button class="type-tab" onclick="switchType('wolse')">월세</button>
-</div>
 
 <!-- Share Bar -->
 <div class="share-bar">
@@ -148,7 +140,13 @@ table.main-table thead th:last-child{text-align:right}
   <button class="share-btn-s copy" onclick="copyLink(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span class="label-text">링크 복사</span></button>
 </div>
 
-<!-- Tabs -->
+<!-- Type Tabs -->
+<div class="type-tabs" id="typeTabs">
+<button class="type-tab active" onclick="switchType('jeonse')">전세</button>
+<button class="type-tab" onclick="switchType('wolse')">월세</button>
+</div>
+
+<!-- Region Tabs -->
 <div class="tab-section">
 <div class="tab-group-label">특별시 · 광역시 · 특별자치시</div>
 <div class="tab-row" id="metroTabs"></div>
@@ -174,9 +172,8 @@ table.main-table thead th:last-child{text-align:right}
 <div class="chart-header">
 <span class="chart-title" id="chartTitle">평당가 추이</span>
 <div class="toggle-btns">
+<button class="toggle-btn active" onclick="setRange(6)" id="btn-6m">6개월</button>
 <button class="toggle-btn" onclick="setRange(12)" id="btn-1y">1년</button>
-<button class="toggle-btn" onclick="setRange(24)" id="btn-2y">2년</button>
-<button class="toggle-btn active" onclick="setRange(36)" id="btn-3y">3년</button>
 </div>
 </div>
 <div class="chart-canvas-wrap">
@@ -188,7 +185,7 @@ table.main-table thead th:last-child{text-align:right}
 
 <!-- Table -->
 <table class="main-table">
-<thead><tr><th>순위</th><th>단지명</th><th>동</th><th style="text-align:right;" id="priceHeader">평당가</th></tr></thead>
+<thead><tr><th>순위</th><th>단지명</th><th>동</th><th style="text-align:right;" id="priceHeader">평당 보증금</th></tr></thead>
 <tbody id="tableBody"></tbody>
 </table>
 
@@ -200,9 +197,9 @@ table.main-table thead th:last-child{text-align:right}
 
 <script>
 /* ── 공유 ── */
-const SHARE_URL = 'https://herdvibe.com/37';
-const SHARE_TITLE = '전국 구별 아파트 평당가 TOP 10';
-const SHARE_DESC = '최근 6개월 실거래 기준 · 전용면적 59㎡ 이상 · 단지별 최고가';
+const SHARE_URL = 'https://herdvibe.com/rent';
+const SHARE_TITLE = '전국 구별 아파트 전월세 평당가 TOP 10';
+const SHARE_DESC = '최근 6개월 실거래 기준 · 전용면적 59㎡ 이상';
 
 function openUrl(url) {
     const a = document.createElement('a');
@@ -253,48 +250,26 @@ function showCopied(btn) {
     }, 2000);
 }
 function doCopy(text) {
-    // 방법1: Clipboard API (top-level + secure context)
     try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).catch(function(){
-                fallbackCopy(text);
-            });
+            navigator.clipboard.writeText(text).catch(function(){ fallbackCopy(text); });
             return;
         }
     } catch(e) {}
     fallbackCopy(text);
 }
 function fallbackCopy(text) {
-    // 방법2: execCommand
     var ta = document.createElement('textarea');
     ta.value = text;
     ta.setAttribute('readonly', '');
-    ta.style.position = 'fixed';
-    ta.style.left = '0';
-    ta.style.top = '0';
-    ta.style.width = '2em';
-    ta.style.height = '2em';
-    ta.style.padding = '0';
-    ta.style.border = 'none';
-    ta.style.outline = 'none';
-    ta.style.boxShadow = 'none';
-    ta.style.background = 'transparent';
-    ta.style.opacity = '0.01';
+    ta.style.cssText = 'position:fixed;left:0;top:0;width:2em;height:2em;padding:0;border:none;outline:none;box-shadow:none;background:transparent;opacity:0.01';
     document.body.appendChild(ta);
     if (navigator.userAgent.match(/ipad|ipod|iphone/i)) {
-        ta.contentEditable = true;
-        ta.readOnly = true;
-        var range = document.createRange();
-        range.selectNodeContents(ta);
-        var sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
+        ta.contentEditable = true; ta.readOnly = true;
+        var range = document.createRange(); range.selectNodeContents(ta);
+        var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
         ta.setSelectionRange(0, 999999);
-    } else {
-        ta.focus();
-        ta.select();
-        ta.setSelectionRange(0, ta.value.length);
-    }
+    } else { ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length); }
     try { document.execCommand('copy'); } catch(e) {}
     document.body.removeChild(ta);
 }
@@ -335,41 +310,27 @@ let currentSido = "서울시";
 let currentDistrict = "강남구";
 let chart = null;
 let activeIdx = -1;
-let currentRange = 36;
+let currentRange = 6;
 let currentLabels = [];
 let currentSeries = [];
-let currentType = 'sale';
+let currentType = 'jeonse';
 
 const TYPE_CONFIG = {
-    sale: {
-        json: 'data/district_top10.json',
-        title: '전국 구별 아파트 평당가 TOP 10',
-        subtitle: '최근 6개월 실거래 기준 · 전용면적 59㎡ 이상 · 단지별 최고가',
-        priceLabel: '평당가',
-        amountLabel: '거래금액',
-        chartTitle: suffix => suffix + ' TOP 10 평당가 추이',
-        cardLabel: suffix => suffix + ' TOP 10 평균',
-        defaultRange: 36
-    },
     jeonse: {
         json: 'data/district_top10_jeonse.json',
         title: '전국 구별 아파트 전세 평당가 TOP 10',
         subtitle: '최근 6개월 실거래 기준 · 전용면적 59㎡ 이상 · 단지별 최고가',
         priceLabel: '평당 보증금',
-        amountLabel: '보증금',
         chartTitle: suffix => suffix + ' TOP 10 전세 평당가 추이',
-        cardLabel: suffix => suffix + ' TOP 10 평균',
-        defaultRange: 12
+        cardLabel: suffix => suffix + ' TOP 10 평균'
     },
     wolse: {
         json: 'data/district_top10_wolse.json',
         title: '전국 구별 아파트 월세 환산 평당가 TOP 10',
         subtitle: '최근 6개월 실거래 기준 · 전용면적 59㎡ 이상 · 환산보증금(전환율 5%) 기준',
         priceLabel: '평당 환산가',
-        amountLabel: '환산보증금',
         chartTitle: suffix => suffix + ' TOP 10 월세 환산 평당가 추이',
-        cardLabel: suffix => suffix + ' TOP 10 평균',
-        defaultRange: 12
+        cardLabel: suffix => suffix + ' TOP 10 평균'
     }
 };
 
@@ -428,6 +389,12 @@ function fp(p) {
     return b > 0 ? b + '억 ' + r.toLocaleString() + '만' : p.toLocaleString() + '만';
 }
 
+function fp_full(p) {
+    const b = p / 10000;
+    if (b >= 1) return b === Math.floor(b) ? Math.floor(b) + '억' : b.toFixed(1) + '억';
+    return p.toLocaleString() + '만';
+}
+
 function render() {
     const key = currentSido + '|' + currentDistrict;
     const d = DATA ? DATA.data[key] : null;
@@ -453,30 +420,23 @@ async function switchType(type) {
     currentType = type;
     const cfg = TYPE_CONFIG[type];
 
-    // 탭 UI 업데이트
+    // 탭 UI
     document.querySelectorAll('.type-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.type-tab').forEach(t => {
-        if ((type === 'sale' && t.textContent === '매매') ||
-            (type === 'jeonse' && t.textContent === '전세') ||
+        if ((type === 'jeonse' && t.textContent === '전세') ||
             (type === 'wolse' && t.textContent === '월세'))
             t.classList.add('active');
     });
 
-    // 헤더 업데이트
+    // 헤더
     document.getElementById('mainTitle').textContent = cfg.title;
     document.getElementById('mainSubtitle').textContent = cfg.subtitle;
     document.getElementById('priceHeader').textContent = cfg.priceLabel;
 
-    // 기간 토글 기본값
-    currentRange = cfg.defaultRange;
+    // 기간 초기화
+    currentRange = 6;
     document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-    if (cfg.defaultRange <= 12) {
-        document.getElementById('btn-1y').classList.add('active');
-    } else if (cfg.defaultRange <= 24) {
-        document.getElementById('btn-2y').classList.add('active');
-    } else {
-        document.getElementById('btn-3y').classList.add('active');
-    }
+    document.getElementById('btn-6m').classList.add('active');
 
     // 데이터 로드
     activeIdx = -1;
@@ -487,13 +447,8 @@ async function switchType(type) {
             document.getElementById('footerText').textContent = '마지막 업데이트: ' + DATA.updated + ' · 데이터 출처: 국토교통부 실거래가 공개시스템';
         } else throw new Error();
     } catch(e) {
-        if (type === 'sale') {
-            DATA = genSample();
-            document.getElementById('footerText').textContent = '샘플 데이터 표시 중';
-        } else {
-            DATA = { updated: '-', labels: [], data: {} };
-            document.getElementById('footerText').textContent = '데이터 없음 · CSV를 data/csv_jeonse/ 에 추가 후 GitHub Actions를 실행하세요';
-        }
+        DATA = { updated: '-', labels: [], data: {} };
+        document.getElementById('footerText').textContent = '데이터 없음 · CSV를 data/csv_jeonse/ 에 추가 후 GitHub Actions를 실행하세요';
     }
     render();
 }
@@ -548,7 +503,7 @@ function getAptName(i) {
 function setRange(m) {
     currentRange = m;
     document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(m===12?'btn-1y':m===24?'btn-2y':'btn-3y').classList.add('active');
+    document.getElementById(m === 6 ? 'btn-6m' : 'btn-1y').classList.add('active');
     renderChart();
 }
 
@@ -558,29 +513,22 @@ function renderTable(d) {
         tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">해당 지역에 데이터가 없습니다</td></tr>';
         return;
     }
-    const cfg = TYPE_CONFIG[currentType];
     let html = '';
     d.top10.forEach((apt, i) => {
         const c = COLORS[i];
-        // 상세 정보 구성
-        let detailRows = `
-            <tr><th>전용면적</th><td>${apt.area_m2}㎡ (${apt.area_pyeong}평)</td></tr>`;
+        let detailRows = `<tr><th>전용면적</th><td>${apt.area_m2}㎡ (${apt.area_pyeong}평)</td></tr>`;
 
-        if (currentType === 'wolse' && apt.deposit !== undefined) {
+        if (currentType === 'wolse') {
             detailRows += `
             <tr><th>보증금</th><td>${fp_full(apt.deposit)}</td></tr>
             <tr><th>월세</th><td>${apt.monthly.toLocaleString()}만</td></tr>
             <tr><th>환산보증금</th><td>${fp_full(apt.price)}</td></tr>`;
-        } else if (currentType === 'jeonse' && apt.deposit !== undefined) {
-            detailRows += `
-            <tr><th>보증금</th><td>${fp_full(apt.deposit)}</td></tr>`;
         } else {
-            detailRows += `
-            <tr><th>거래금액</th><td>${fp_full(apt.price)}</td></tr>`;
+            detailRows += `<tr><th>보증금</th><td>${fp_full(apt.deposit)}</td></tr>`;
         }
 
         detailRows += `
-            <tr><th>${currentType === 'sale' ? '거래일' : '계약일'}</th><td>${apt.date}</td></tr>
+            <tr><th>계약일</th><td>${apt.date}</td></tr>
             <tr><th>층</th><td>${apt.floor}층</td></tr>
             <tr><th>건축년도</th><td>${apt.build_year}년</td></tr>`;
 
@@ -597,12 +545,6 @@ function renderTable(d) {
         </div></td></tr>`;
     });
     tbody.innerHTML = html;
-}
-
-function fp_full(p) {
-    const b = p / 10000;
-    if (b >= 1) return b === Math.floor(b) ? Math.floor(b) + '억' : b.toFixed(1) + '억';
-    return p.toLocaleString() + '만';
 }
 
 function highlightChart(idx) {
@@ -641,47 +583,10 @@ function handleRowClick(idx) {
     if (arr) arr.classList.toggle('open');
 }
 
-function genSample() {
-    function line(base, seed) {
-        const a = []; let v = base, s = seed;
-        for (let i = 0; i < 36; i++) { s = (s * 9301 + 49297) % 233280; v += Math.round((s/233280 - 0.38) * 500); a.push(s/233280 > 0.9 ? null : v); }
-        return a;
-    }
-    const labels = [];
-    for (let y = 2023; y <= 2026; y++) for (let m = 1; m <= 12; m++) { const l = y+'.'+String(m).padStart(2,'0'); if (labels.length < 36) labels.push(l); }
-    const sample = {
-        "서울시|강남구": { avg:28500, deals:245, top10:[
-            {name:"더펜트하우스청담",dong:"청담동",area_m2:222.86,area_pyeong:67.5,price:1920000,ppyeong:28500,date:"2025.11.28",floor:"15",build_year:"2015"},
-            {name:"도곡렉슬",dong:"도곡동",area_m2:84.99,area_pyeong:25.8,price:575000,ppyeong:22300,date:"2025.11.25",floor:"18",build_year:"2003"},
-            {name:"타워팰리스3차",dong:"도곡동",area_m2:163.23,area_pyeong:49.5,price:1030000,ppyeong:20800,date:"2025.10.15",floor:"55",build_year:"2004"},
-            {name:"래미안대치팰리스",dong:"대치동",area_m2:84.98,area_pyeong:25.7,price:510000,ppyeong:19800,date:"2025.11.22",floor:"16",build_year:"2015"},
-            {name:"은마아파트",dong:"대치동",area_m2:84.43,area_pyeong:25.6,price:492000,ppyeong:19200,date:"2025.12.12",floor:"8",build_year:"1979"},
-            {name:"개포자이프레지던스",dong:"개포동",area_m2:84.98,area_pyeong:25.7,price:480000,ppyeong:18600,date:"2025.10.08",floor:"22",build_year:"2021"},
-            {name:"디에이치자이개포",dong:"개포동",area_m2:84.97,area_pyeong:25.7,price:465000,ppyeong:18100,date:"2025.11.05",floor:"19",build_year:"2021"},
-            {name:"대치SK뷰",dong:"대치동",area_m2:84.99,area_pyeong:25.8,price:450000,ppyeong:17400,date:"2025.12.01",floor:"14",build_year:"2018"},
-            {name:"래미안블레스티지",dong:"개포동",area_m2:84.98,area_pyeong:25.7,price:440000,ppyeong:17100,date:"2025.10.20",floor:"11",build_year:"2019"},
-            {name:"삼성래미안",dong:"대치동",area_m2:84.97,area_pyeong:25.7,price:425000,ppyeong:16500,date:"2025.11.15",floor:"9",build_year:"2009"}
-        ], series: Array.from({length:10},(_,i)=>line(28000-i*1200, (i+1)*137))},
-        "서울시|서초구": { avg:26800, deals:198, top10:[
-            {name:"아크로리버파크",dong:"반포동",area_m2:84.98,area_pyeong:25.7,price:850000,ppyeong:33074,date:"2026.01.15",floor:"25",build_year:"2016"},
-            {name:"래미안원베일리",dong:"반포동",area_m2:84.99,area_pyeong:25.8,price:810000,ppyeong:31500,date:"2026.01.10",floor:"32",build_year:"2024"},
-            {name:"래미안퍼스티지",dong:"반포동",area_m2:84.97,area_pyeong:25.7,price:653000,ppyeong:25400,date:"2025.12.18",floor:"21",build_year:"2009"},
-            {name:"반포자이",dong:"반포동",area_m2:84.94,area_pyeong:25.7,price:638000,ppyeong:24800,date:"2025.10.22",floor:"15",build_year:"2009"},
-            {name:"반포래미안아이파크",dong:"반포동",area_m2:59.96,area_pyeong:18.2,price:355000,ppyeong:19500,date:"2025.10.28",floor:"12",build_year:"2018"},
-            {name:"잠원래미안",dong:"잠원동",area_m2:84.97,area_pyeong:25.7,price:480000,ppyeong:18600,date:"2025.11.10",floor:"10",build_year:"2010"},
-            {name:"서초그랑자이",dong:"서초동",area_m2:84.98,area_pyeong:25.7,price:465000,ppyeong:18100,date:"2025.12.02",floor:"18",build_year:"2021"},
-            {name:"래미안서초에스티지",dong:"서초동",area_m2:84.99,area_pyeong:25.8,price:450000,ppyeong:17400,date:"2025.10.05",floor:"15",build_year:"2020"},
-            {name:"아크로비스타",dong:"반포동",area_m2:84.97,area_pyeong:25.7,price:435000,ppyeong:16900,date:"2025.11.20",floor:"7",build_year:"2007"},
-            {name:"래미안리더스원",dong:"서초동",area_m2:84.98,area_pyeong:25.7,price:420000,ppyeong:16300,date:"2025.12.08",floor:"20",build_year:"2019"}
-        ], series: Array.from({length:10},(_,i)=>line(32000-i*1800, (i+3)*97))}
-    };
-    return { updated:"샘플 데이터", labels, data:sample };
-}
-
 async function init() {
     buildTabs();
     populateDropdown();
-    await switchType('sale');
+    await switchType('jeonse');
     if (typeof Chart === 'undefined') {
         const retryChart = setInterval(() => { if (typeof Chart !== 'undefined') { clearInterval(retryChart); renderChart(); } }, 200);
         setTimeout(() => clearInterval(retryChart), 10000);
