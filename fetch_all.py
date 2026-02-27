@@ -490,12 +490,118 @@ def build_district_data(recent, alldata, months_6_set, outfile, label):
             "deals": deal_count
         }
 
+    # ── 시도별(시 단위) TOP 10 추가 ──
+    # 키: "서울시|_city_"
+    by_sido = defaultdict(list)
+    for it in recent:
+        by_sido[it['sido']].append(it)
+    sido_all = defaultdict(list)
+    for it in alldata:
+        sido_all[it['sido']].append(it)
+
+    city_count = 0
+    for sido, items in by_sido.items():
+        best = {}
+        for it in items:
+            akey = (it['apt_name'], it['sigungu'])
+            if akey not in best or it['price_per_pyeong'] > best[akey]['price_per_pyeong']:
+                best[akey] = it
+        t10 = sorted(best.values(), key=lambda x: x['price_per_pyeong'], reverse=True)[:10]
+        if not t10:
+            continue
+        apt_monthly = defaultdict(lambda: defaultdict(list))
+        for it in sido_all[sido]:
+            ym = f"{it['deal_year']}.{it['deal_month'].zfill(2)}"
+            akey = (it['apt_name'], it['sigungu'])
+            apt_monthly[akey][ym].append(it['price_per_pyeong'])
+        series = []
+        for apt in t10:
+            akey = (apt['apt_name'], apt['sigungu'])
+            vals = [round(sum(apt_monthly[akey][m]) / len(apt_monthly[akey][m]))
+                    if m in apt_monthly[akey] else None for m in all_months]
+            series.append(vals)
+        deal_count = sum(1 for it in sido_all[sido]
+                         if f"{it['deal_year']}{it['deal_month'].zfill(2)}" in months_6_set)
+        avg_pp = round(sum(it['price_per_pyeong'] for it in t10) / len(t10))
+        result["data"][f"{sido}|_city_"] = {
+            "top10": [{
+                "name": it['apt_name'], "dong": it['sigungu'] + ' ' + it['dong'],
+                "area_m2": it['area_m2'], "area_pyeong": it['area_pyeong'],
+                "price": it['price'], "deposit": it['deposit'], "monthly": it['monthly'],
+                "ppyeong": it['price_per_pyeong'],
+                "date": f"{it['deal_year']}.{it['deal_month'].zfill(2)}.{it['deal_day'].zfill(2)}",
+                "floor": it['floor'], "build_year": it['build_year']
+            } for it in t10],
+            "series": series, "avg": avg_pp, "deals": deal_count
+        }
+        city_count += 1
+    print(f"  → 시도별 TOP 10: {city_count}개 추가")
+
+    # ── 도(道) 내 시 단위 TOP 10 추가 ──
+    # 키: "경기도|_city_안양시"
+    PROV_SIDOS = {"경기도", "강원도", "충북", "충남", "전북", "전남", "경북", "경남", "제주도"}
+    def extract_city(sigungu):
+        parts = sigungu.split()
+        return parts[0] if len(parts) >= 2 and (parts[0].endswith('시') or parts[0].endswith('군')) else sigungu
+
+    by_sido_city = defaultdict(list)
+    for it in recent:
+        if it['sido'] in PROV_SIDOS:
+            by_sido_city[(it['sido'], extract_city(it['sigungu']))].append(it)
+    sido_city_all = defaultdict(list)
+    for it in alldata:
+        if it['sido'] in PROV_SIDOS:
+            sido_city_all[(it['sido'], extract_city(it['sigungu']))].append(it)
+
+    subcity_count = 0
+    for (sido, city), items in by_sido_city.items():
+        if len(set(it['sigungu'] for it in items)) < 2:
+            continue
+        best = {}
+        for it in items:
+            akey = (it['apt_name'], it['sigungu'])
+            if akey not in best or it['price_per_pyeong'] > best[akey]['price_per_pyeong']:
+                best[akey] = it
+        t10 = sorted(best.values(), key=lambda x: x['price_per_pyeong'], reverse=True)[:10]
+        if not t10:
+            continue
+        apt_monthly = defaultdict(lambda: defaultdict(list))
+        for it in sido_city_all[(sido, city)]:
+            ym = f"{it['deal_year']}.{it['deal_month'].zfill(2)}"
+            akey = (it['apt_name'], it['sigungu'])
+            apt_monthly[akey][ym].append(it['price_per_pyeong'])
+        series = []
+        for apt in t10:
+            akey = (apt['apt_name'], apt['sigungu'])
+            vals = [round(sum(apt_monthly[akey][m]) / len(apt_monthly[akey][m]))
+                    if m in apt_monthly[akey] else None for m in all_months]
+            series.append(vals)
+        deal_count = sum(1 for it in sido_city_all[(sido, city)]
+                         if f"{it['deal_year']}{it['deal_month'].zfill(2)}" in months_6_set)
+        avg_pp = round(sum(it['price_per_pyeong'] for it in t10) / len(t10))
+        def make_dong(it, cn=city):
+            sub = it['sigungu'].replace(cn + ' ', '') if cn != it['sigungu'] else ''
+            return (sub + ' ' + it['dong']).strip()
+        result["data"][f"{sido}|_city_{city}"] = {
+            "top10": [{
+                "name": it['apt_name'], "dong": make_dong(it),
+                "area_m2": it['area_m2'], "area_pyeong": it['area_pyeong'],
+                "price": it['price'], "deposit": it['deposit'], "monthly": it['monthly'],
+                "ppyeong": it['price_per_pyeong'],
+                "date": f"{it['deal_year']}.{it['deal_month'].zfill(2)}.{it['deal_day'].zfill(2)}",
+                "floor": it['floor'], "build_year": it['build_year']
+            } for it in t10],
+            "series": series, "avg": avg_pp, "deals": deal_count
+        }
+        subcity_count += 1
+    print(f"  → 도 내 시 단위 TOP 10: {subcity_count}개 추가")
+
     outpath = os.path.join(DATA_DIR, outfile)
     with open(outpath, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False)
 
     fsize = os.path.getsize(outpath) / 1024
-    print(f"  → {len(top10_map)}개 지역 → {outpath} ({fsize:.0f}KB)")
+    print(f"  → {len(top10_map)}개 구 + {city_count}개 시도 + {subcity_count}개 시(도내) → {outpath} ({fsize:.0f}KB)")
 
 
 # ════════════════════════════════════════
