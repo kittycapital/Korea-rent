@@ -66,8 +66,15 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg-primary);color:va
 .tab.active{background:#00d4aa;color:#000;font-weight:700;border-color:#00d4aa}
 
 /* Dropdown */
-.dropdown-area{display:flex;align-items:center;gap:14px;margin-bottom:20px;justify-content:center}
+.dropdown-area{display:flex;align-items:center;gap:14px;margin-bottom:20px;justify-content:center;transition:opacity 0.3s,max-height 0.3s;max-height:60px;overflow:hidden}
+.dropdown-area.hidden{opacity:0;max-height:0;margin-bottom:0;pointer-events:none}
 .dropdown-label{color:#888;font-size:0.85rem;white-space:nowrap}
+
+/* View mode toggle */
+.view-toggle{display:flex;gap:4px;justify-content:center;margin-bottom:16px;background:var(--bg-tertiary);border-radius:10px;padding:4px;width:fit-content;margin-left:auto;margin-right:auto}
+.view-btn{padding:8px 20px;border-radius:8px;font-size:0.82rem;cursor:pointer;border:none;background:transparent;color:#888;transition:all 0.2s;font-family:inherit;font-weight:500}
+.view-btn:hover{color:#ccc}
+.view-btn.active{background:#00d4aa;color:#000;font-weight:700}
 .dropdown-select{flex:0 1 280px;padding:10px 40px 10px 16px;border-radius:10px;background:var(--bg-tertiary);border:1px solid #333;color:#fff;font-size:0.9rem;font-family:inherit;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' fill='none' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;cursor:pointer}
 .dropdown-select:focus{outline:none;border-color:#00d4aa}
 
@@ -119,7 +126,7 @@ table.main-table thead th:last-child{text-align:right}
 
 .footer{margin-top:40px;padding-top:20px;border-top:1px solid #222;color:var(--text-muted);font-size:0.8rem;text-align:center}
 
-@media(max-width:768px){.insight-cards{grid-template-columns:1fr 1fr 1fr}.tab{padding:6px 10px;font-size:0.75rem}.share-btn-s{padding:5px 8px;font-size:10px}.share-btn-s .label-text{display:none}}
+@media(max-width:768px){.insight-cards{grid-template-columns:1fr 1fr 1fr}.tab{padding:6px 10px;font-size:0.75rem}.share-btn-s{padding:5px 8px;font-size:10px}.share-btn-s .label-text{display:none}.view-btn{padding:7px 14px;font-size:0.78rem}}
 @media(max-width:600px){body{padding:20px 12px}.header h1{font-size:1.4rem}.insight-cards{grid-template-columns:1fr}.chart-canvas-wrap{height:180px}.detail-content{flex-direction:column;padding:12px 8px 12px 16px;gap:12px}.detail-map iframe{width:100%;max-width:300px}.main-row td{padding:10px 6px;font-size:0.85rem}}
 </style>
 </head>
@@ -155,9 +162,15 @@ table.main-table thead th:last-child{text-align:right}
 <div class="tab-row" id="provTabs"></div>
 </div>
 
+<!-- View Mode Toggle -->
+<div class="view-toggle">
+<button class="view-btn active" id="viewDistrict" onclick="setViewMode('district')">구별 보기</button>
+<button class="view-btn" id="viewCity" onclick="setViewMode('city')">시 전체 보기</button>
+</div>
+
 <!-- Dropdown -->
 <div class="dropdown-area">
-<div class="dropdown-label">지역 선택</div>
+<div class="dropdown-label" id="dropdownLabel">지역 선택</div>
 <select class="dropdown-select" id="districtSelect" onchange="onDistrictChange()"></select>
 </div>
 
@@ -186,7 +199,7 @@ table.main-table thead th:last-child{text-align:right}
 
 <!-- Table -->
 <table class="main-table">
-<thead><tr><th>순위</th><th>단지명</th><th>동</th><th style="text-align:right;" id="priceHeader">평당 보증금</th></tr></thead>
+<thead><tr><th>순위</th><th>단지명</th><th id="locHeader">동</th><th style="text-align:right;" id="priceHeader">평당 보증금</th></tr></thead>
 <tbody id="tableBody"></tbody>
 </table>
 
@@ -303,12 +316,35 @@ const REGION_MAP = {
 };
 const METRO = ["서울시","인천시","부산시","대구시","광주시","대전시","울산시","세종시"];
 const PROV = ["경기도","강원도","충북","충남","전북","전남","경북","경남","제주도"];
+const PROV_SET = new Set(PROV);
 const TAB_LABELS = {"서울시":"서울","인천시":"인천","부산시":"부산","대구시":"대구","광주시":"광주","대전시":"대전","울산시":"울산","세종시":"세종","경기도":"경기","강원도":"강원","충북":"충북","충남":"충남","전북":"전북","전남":"전남","경북":"경북","경남":"경남","제주도":"제주"};
 const COLORS = ["#00d4aa","#4ecdc4","#ff6b6b","#45b7d1","#96ceb4","#ffeaa7","#a29bfe","#fd79a8","#e17055","#74b9ff"];
+
+function buildCityMap() {
+    const map = {};
+    PROV.forEach(sido => {
+        const districts = REGION_MAP[sido] || [];
+        const cityDistricts = {};
+        districts.forEach(d => {
+            const parts = d.split(' ');
+            if (parts.length >= 2) {
+                const city = parts[0];
+                if (!cityDistricts[city]) cityDistricts[city] = [];
+                cityDistricts[city].push(d);
+            }
+        });
+        const cities = Object.keys(cityDistricts).filter(c => cityDistricts[c].length >= 2).sort();
+        if (cities.length > 0) map[sido] = cities;
+    });
+    return map;
+}
+const CITY_MAP = buildCityMap();
 
 let DATA = null;
 let currentSido = "서울시";
 let currentDistrict = "강남구";
+let currentCity = "";
+let viewMode = "district";
 let chart = null;
 let activeIdx = -1;
 let currentRange = 6;
@@ -316,10 +352,29 @@ let currentLabels = [];
 let currentSeries = [];
 let currentType = 'jeonse';
 
+function getDataKey() {
+    if (viewMode === 'city') {
+        if (PROV_SET.has(currentSido) && currentCity && currentCity !== '_all_')
+            return currentSido + '|_city_' + currentCity;
+        return currentSido + '|_city_';
+    }
+    return currentSido + '|' + currentDistrict;
+}
+
+function getViewLabel() {
+    if (viewMode === 'city') {
+        if (PROV_SET.has(currentSido) && currentCity && currentCity !== '_all_')
+            return currentCity;
+        return TAB_LABELS[currentSido] + ' 전체';
+    }
+    return currentDistrict;
+}
+
 const TYPE_CONFIG = {
     jeonse: {
         json: 'data/district_top10_jeonse.json',
-        title: '전국 구별 아파트 전세 평당가 TOP 10',
+        titleDistrict: '전국 구별 아파트 전세 평당가 TOP 10',
+        titleCity: '전국 시별 아파트 전세 평당가 TOP 10',
         subtitle: '최근 6개월 실거래 기준 · 전용면적 59㎡ 이상 · 단지별 최고가',
         priceLabel: '평당 보증금',
         chartTitle: suffix => suffix + ' TOP 10 전세 평당가 추이',
@@ -327,7 +382,8 @@ const TYPE_CONFIG = {
     },
     wolse: {
         json: 'data/district_top10_wolse.json',
-        title: '전국 구별 아파트 월세 환산 평당가 TOP 10',
+        titleDistrict: '전국 구별 아파트 월세 환산 평당가 TOP 10',
+        titleCity: '전국 시별 아파트 월세 환산 평당가 TOP 10',
         subtitle: '최근 6개월 실거래 기준 · 전용면적 59㎡ 이상 · 환산보증금(전환율 5%) 기준',
         priceLabel: '평당 환산가',
         chartTitle: suffix => suffix + ' TOP 10 월세 환산 평당가 추이',
@@ -360,8 +416,53 @@ function selectSido(sido) {
     document.querySelectorAll('.tab').forEach(t => {
         if (TAB_LABELS[sido] === t.textContent) t.classList.add('active');
     });
-    populateDropdown();
+    if (viewMode === 'city') updateDropdownForCityMode();
+    else populateDropdown();
     onDistrictChange();
+}
+
+function setViewMode(mode) {
+    viewMode = mode;
+    document.getElementById('viewDistrict').classList.toggle('active', mode === 'district');
+    document.getElementById('viewCity').classList.toggle('active', mode === 'city');
+    const cfg = TYPE_CONFIG[currentType];
+    document.getElementById('mainTitle').textContent = mode === 'city' ? cfg.titleCity : cfg.titleDistrict;
+    if (mode === 'city') updateDropdownForCityMode();
+    else {
+        const dd = document.querySelector('.dropdown-area');
+        dd.classList.remove('hidden');
+        document.getElementById('dropdownLabel').textContent = '지역 선택';
+        populateDropdown();
+    }
+    activeIdx = -1;
+    render();
+}
+
+function updateDropdownForCityMode() {
+    const dd = document.querySelector('.dropdown-area');
+    if (PROV_SET.has(currentSido) && CITY_MAP[currentSido]) {
+        dd.classList.remove('hidden');
+        document.getElementById('dropdownLabel').textContent = '시 선택';
+        populateCityDropdown();
+    } else {
+        dd.classList.add('hidden');
+    }
+}
+
+function populateCityDropdown() {
+    const sel = document.getElementById('districtSelect');
+    sel.innerHTML = '';
+    const cities = CITY_MAP[currentSido] || [];
+    const optAll = document.createElement('option');
+    optAll.value = '_all_'; optAll.textContent = TAB_LABELS[currentSido] + ' 전체';
+    sel.appendChild(optAll);
+    cities.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c; opt.textContent = c;
+        sel.appendChild(opt);
+    });
+    if (currentCity && (currentCity === '_all_' || cities.includes(currentCity))) sel.value = currentCity;
+    else { currentCity = '_all_'; sel.value = '_all_'; }
 }
 
 function populateDropdown() {
@@ -379,7 +480,8 @@ function populateDropdown() {
 
 function onDistrictChange() {
     const sel = document.getElementById('districtSelect');
-    currentDistrict = sel.value;
+    if (viewMode === 'city') currentCity = sel.value;
+    else currentDistrict = sel.value;
     activeIdx = -1;
     render();
 }
@@ -397,10 +499,11 @@ function fp_full(p) {
 }
 
 function render() {
-    const key = currentSido + '|' + currentDistrict;
+    const key = getDataKey();
+    const label = getViewLabel();
     const d = DATA ? DATA.data[key] : null;
     const cfg = TYPE_CONFIG[currentType];
-    document.getElementById('cardLabel1').textContent = cfg.cardLabel(currentDistrict);
+    document.getElementById('cardLabel1').textContent = cfg.cardLabel(label);
     if (d) {
         document.getElementById('cardVal1').textContent = fp(d.avg);
         document.getElementById('cardVal2').textContent = d.top10[0].name;
@@ -410,7 +513,7 @@ function render() {
         document.getElementById('cardVal2').textContent = '-';
         document.getElementById('cardVal3').textContent = '-';
     }
-    document.getElementById('chartTitle').textContent = cfg.chartTitle(currentDistrict);
+    document.getElementById('chartTitle').textContent = cfg.chartTitle(label);
     currentLabels = DATA ? DATA.labels : [];
     currentSeries = d ? d.series : [];
     renderChart();
@@ -429,7 +532,7 @@ async function switchType(type) {
             t.classList.add('active');
     });
 
-    document.getElementById('mainTitle').textContent = cfg.title;
+    document.getElementById('mainTitle').textContent = viewMode === 'city' ? cfg.titleCity : cfg.titleDistrict;
     document.getElementById('mainSubtitle').textContent = cfg.subtitle;
     document.getElementById('priceHeader').textContent = cfg.priceLabel;
 
@@ -493,7 +596,7 @@ function renderChart() {
 }
 
 function getAptName(i) {
-    const key = currentSido + '|' + currentDistrict;
+    const key = getDataKey();
     const d = DATA ? DATA.data[key] : null;
     return d && d.top10[i] ? d.top10[i].name : '';
 }
@@ -507,6 +610,8 @@ function setRange(m) {
 
 function renderTable(d) {
     const tbody = document.getElementById('tableBody');
+    const isCity = viewMode === 'city';
+    document.getElementById('locHeader').textContent = isCity ? '지역' : '동';
     if (!d || !d.top10.length) {
         tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">해당 지역에 데이터가 없습니다</td></tr>';
         return;
@@ -530,6 +635,14 @@ function renderTable(d) {
             <tr><th>층</th><td>${apt.floor}층</td></tr>
             <tr><th>건축년도</th><td>${apt.build_year}년</td></tr>`;
 
+        let mapQuery;
+        if (isCity) {
+            const cityLabel = (PROV_SET.has(currentSido) && currentCity && currentCity !== '_all_') ? currentCity : '';
+            mapQuery = apt.name + ' ' + currentSido + ' ' + cityLabel + ' ' + apt.dong;
+        } else {
+            mapQuery = apt.name + ' ' + currentSido + ' ' + currentDistrict + ' ' + apt.dong;
+        }
+
         html += `<tr class="main-row" data-idx="${i}" onclick="handleRowClick(${i})">
             <td class="rank-cell">${i+1}</td>
             <td class="apt-name"><span class="color-dot" style="background:${c}"></span>${apt.name} <span class="arrow" id="arrow-${i}">▼</span></td>
@@ -539,7 +652,7 @@ function renderTable(d) {
         <tr class="detail-row" id="detail-${i}"><td colspan="4"><div class="detail-content"><div class="detail-info"><table class="detail-table">
             ${detailRows}
         </table></div>
-        <div class="detail-map"><iframe width="300" height="200" style="border:0;border-radius:8px;" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=${encodeURIComponent(apt.name+' '+currentSido+' '+currentDistrict+' '+apt.dong)}&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe></div>
+        <div class="detail-map"><iframe width="300" height="200" style="border:0;border-radius:8px;" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe></div>
         </div></td></tr>`;
     });
     tbody.innerHTML = html;
